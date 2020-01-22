@@ -4,32 +4,50 @@
 
 int main(int argc, char *argv[]){
 
-  char binary[32] = {0};
+  int count = 0;
+  int ascii;
+  char ch, chNext;
   
   if(argc == 1){
     printf("wzip: file1 [file2 ...]\n");
     return 1;
   }
-
+  
   else{
     for(int c = 1; c < argc; c++){
-      
-      int count = 63;
-      int i;
 
-      for(i = 0; i < 32; i++){
-	binary[31 - i] = count % 2;
-	count = count / 2;
+      FILE *newStream = fopen(argv[c], "r");
+      if(newStream == NULL){
+	return 1;
       }
-    
-      for(i = 0; i < 32; i++){
-	printf("%d", binary[i]);
-      }
-    
-      printf("end of else");
 
-    }
-  }
+      ch = fgetc(newStream);
+      while(!feof(newStream)){
+	
+	chNext = fgetc(newStream);
+	if(count == 0){
+	  count = 1;
+	}
+	while(ch == chNext){
+	  chNext = fgetc(newStream);
+	  count = count + 1;
+	}
+
+	ascii = ch;
+
+	if(feof(newStream) && c != argc - 1){
+	  count++;
+	  break;
+	}
+	if(ascii != -1){
+	  fwrite(&count, 4, 1, stdout);
+	  fwrite(&ascii, 1, 1,  stdout);
+	}
+	ch = chNext;
+	count = 0;
+      }
+    } //End of argv for
+  } //End of else
   
   return 0;
-}
+} //End of Prgm
